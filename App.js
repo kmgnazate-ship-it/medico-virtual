@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 
 import { SINTOMAS_CATALOGO } from './src/data/sintomasData';
+import { guardarConsultaSupabase, obtenerConsultasSupabase } from './src/data/supabase';
 import InicioScreen from './src/screens/InicioScreen';
 import GuiaScreen from './src/screens/GuiaScreen';
 import ConsultaScreen from './src/screens/ConsultaScreen';
@@ -13,12 +14,22 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [consultas, setConsultas] = useState(SINTOMAS_CATALOGO);
 
-  const registrarHistorial = (itemSeleccionado) => {
-    const registro = {
-      ...itemSeleccionado,
-      id: Date.now().toString(),
+  // Carga los registros desde Supabase al abrir la app
+  useEffect(() => {
+    const cargarDesdeNube = async () => {
+      const guardados = await obtenerConsultasSupabase();
+      if (guardados.length > 0) {
+        setConsultas([...guardados, ...SINTOMAS_CATALOGO]);
+      }
     };
-    setConsultas([registro, ...consultas]);
+    cargarDesdeNube();
+  }, []);
+
+  // Guarda el síntoma en Supabase y actualiza la lista
+  const registrarHistorial = async (itemSeleccionado) => {
+    await guardarConsultaSupabase(itemSeleccionado);
+    const guardados = await obtenerConsultasSupabase();
+    setConsultas([...guardados, ...SINTOMAS_CATALOGO]);
   };
 
   return (
