@@ -45,7 +45,7 @@ export default function GuiaScreen({ consultas, navigation }) {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate('Consulta')}
+        onPress={() => navigation.navigate('Evaluación')}
       >
         <Text style={styles.fabTexto}>+ Nueva Consulta</Text>
       </TouchableOpacity>
